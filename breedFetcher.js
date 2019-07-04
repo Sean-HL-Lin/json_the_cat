@@ -1,15 +1,27 @@
 const request = require('request');
 
-request(`https://api.thecatapi.com/v1/breeds/search?q=${process.argv[2]}`,(err, response, body) => {
-  if (!err) {
-    const data = JSON.parse(body);
-    if (data.length === 0) {
-      console.log(`Sorry, There is no matched detail about ${process.argv[2]}`);
+
+const fetchBreedDescription = function(req, callback) {
+  request(`https://api.thecatapi.com/v1/breeds/search?q=${req}`,(err, response, body) => {
+    if (!err) {
+      const data = JSON.parse(body);
+      if (!data[0]) {
+
+        let erroMessage = `Sorry, There is no matched detail about ${req}`;
+        let context = null;
+        callback(erroMessage, context);
+        // console.log(`Sorry, There is no matched detail about ${req}`);
+      } else {
+        callback(err, data[0].description);
+        // console.log(data[0].description);
+        // console.log(typeof data);
+      }
     } else {
-      console.log(data);
-      console.log(typeof data);
+      callback(err);
+      // console.log(err);
     }
-  } else {
-    console.log(err);
-  }
-});
+  });
+};
+
+
+module.exports = { fetchBreedDescription };
